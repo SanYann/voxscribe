@@ -69,6 +69,54 @@ The first time you use a model, voxscribe downloads its GGML weights into
 For everyday voice notes, `base` is fine; reach for `medium` or
 `large-v3-turbo` when accuracy matters or the audio is noisy.
 
+## Use it from Claude (MCP)
+
+voxscribe ships an [MCP](https://modelcontextprotocol.io) server so Claude can
+transcribe audio for you — "transcribe this voice note" just works, the file
+never leaves your machine.
+
+Install with the `mcp` extra so the `voxscribe-mcp` command is on your PATH:
+
+```bash
+pipx install "voxscribe[mcp]"     # recommended (keeps it on PATH)
+# or
+pip install "voxscribe[mcp]"
+```
+
+It exposes two tools:
+
+| Tool | Description |
+| --- | --- |
+| `transcribe` | Transcribe a local audio file (`path`, `language`, `model`, `format`, `translate`) |
+| `list_models` | List available models and their size / quality trade-offs |
+
+### Claude Code
+
+```bash
+claude mcp add voxscribe -- voxscribe-mcp
+```
+
+Then just ask: *"transcribe ~/Downloads/note.opus in French"*.
+
+### Claude Desktop
+
+Add this to `claude_desktop_config.json`
+(macOS: `~/Library/Application Support/Claude/claude_desktop_config.json`):
+
+```json
+{
+  "mcpServers": {
+    "voxscribe": {
+      "command": "voxscribe-mcp"
+    }
+  }
+}
+```
+
+Restart Claude Desktop and the **voxscribe** tools appear in the 🔌 menu.
+
+> Uses the stdio transport, so it works in any MCP-compatible client.
+
 ## How it works
 
 1. `ffmpeg` converts the input to 16 kHz mono WAV (what whisper.cpp expects).

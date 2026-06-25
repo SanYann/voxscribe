@@ -3,6 +3,7 @@
 import pytest
 
 from voxscribe.cli import _build_parser
+from voxscribe.mcp_server import transcribe_file
 from voxscribe.models import MODELS, cache_dir, resolve_model
 
 
@@ -43,3 +44,15 @@ def test_local_bin_path_resolves(tmp_path):
 
 def test_catalog_not_empty():
     assert "base" in MODELS
+
+
+def test_mcp_transcribe_missing_file():
+    with pytest.raises(ValueError, match="no such file"):
+        transcribe_file("/no/such/audio.opus")
+
+
+def test_mcp_transcribe_bad_format(tmp_path):
+    audio = tmp_path / "a.wav"
+    audio.write_bytes(b"")
+    with pytest.raises(ValueError, match="unknown format"):
+        transcribe_file(str(audio), fmt="doc")

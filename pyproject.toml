@@ -21,12 +21,16 @@ classifiers = [
 ]
 dependencies = []
 
+[project.optional-dependencies]
+mcp = ["mcp>=1.2.0"]
+
 [project.urls]
 Homepage = "https://github.com/SanYann/voxscribe"
 Issues = "https://github.com/SanYann/voxscribe/issues"
 
 [project.scripts]
 voxscribe = "voxscribe.cli:main"
+voxscribe-mcp = "voxscribe.mcp_server:main"
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/voxscribe"]
