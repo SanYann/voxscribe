@@ -9,7 +9,43 @@ $ voxscribe "WhatsApp Audio 2026-06-23.opus" -l fr
 Et donc en fait, tous les ans, avant le 30 juin, il faut déposer les comptes auprès du greffe...
 ```
 
-## Install
+## Easy install (no coding needed) 🟢
+
+For macOS — you don't need to understand any of this, just follow along.
+
+1. Open the **Terminal** app (press `⌘ + Space`, type `Terminal`, hit Enter).
+2. Copy the line below, paste it into the Terminal (`⌘ + V`), and press Enter:
+
+   ```bash
+   curl -fsSL https://raw.githubusercontent.com/SanYann/voxscribe/main/install.sh | bash
+   ```
+
+3. Wait. It installs everything for you (it may ask for your Mac password — that's
+   normal, type it and press Enter; the characters stay invisible).
+4. When it says **Done! 🎉**, **close the Terminal and open a new one**.
+
+That's it. To transcribe a voice note, drag-and-drop is easiest:
+
+```bash
+voxscribe 
+```
+
+…type `voxscribe ` then a space, **drag your audio file onto the Terminal window**
+(its path appears automatically), and press Enter. Add `-l fr` for French:
+
+```bash
+voxscribe "/Users/you/Downloads/note.opus" -l fr
+```
+
+> The very first run downloads a small AI model (~140 MB). That happens once.
+
+If you also use **Claude**, the installer connects voxscribe automatically — then
+you can just tell Claude *"transcribe this voice note"* and it does it for you.
+See [Use it from Claude](#use-it-from-claude-mcp) below.
+
+---
+
+## Manual install (for developers)
 
 voxscribe wraps two native tools — install them first:
 
