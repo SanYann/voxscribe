@@ -4,6 +4,8 @@ Transcribe voice notes — WhatsApp `.opus`, `.mp3`, `.m4a`, `.ogg`, anything `f
 
 It started as a one-off: a friend sent a 1-minute WhatsApp voice note and asked "can you transcribe this?". This is that, packaged.
 
+> 🍎 **macOS only** for now. voxscribe is built and tested for Mac — it won't run on Windows, and Linux isn't supported.
+
 ```console
 $ voxscribe "WhatsApp Audio 2026-06-23.opus" -l fr
 Et donc en fait, tous les ans, avant le 30 juin, il faut déposer les comptes auprès du greffe...
@@ -49,10 +51,9 @@ See [Use it from Claude](#use-it-from-claude-mcp) below.
 
 voxscribe wraps two native tools — install them first:
 
-| Platform | ffmpeg | whisper.cpp |
-| --- | --- | --- |
-| macOS (Homebrew) | `brew install ffmpeg` | `brew install whisper-cpp` |
-| Debian / Ubuntu | `sudo apt install ffmpeg` | [build from source](https://github.com/ggerganov/whisper.cpp) |
+```bash
+brew install ffmpeg whisper-cpp
+```
 
 Then install voxscribe itself:
 
