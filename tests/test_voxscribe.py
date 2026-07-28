@@ -56,3 +56,28 @@ def test_mcp_transcribe_bad_format(tmp_path):
     audio.write_bytes(b"")
     with pytest.raises(ValueError, match="unknown format"):
         transcribe_file(str(audio), fmt="doc")
+
+
+def test_translate_to_requires_source(tmp_path):
+    audio = tmp_path / "a.wav"
+    audio.write_bytes(b"")
+    with pytest.raises(ValueError, match="source language"):
+        transcribe_file(str(audio), language="auto", translate_to="fr")
+
+
+def test_translate_to_requires_txt(tmp_path):
+    audio = tmp_path / "a.wav"
+    audio.write_bytes(b"")
+    with pytest.raises(ValueError, match="txt format"):
+        transcribe_file(str(audio), language="en", fmt="srt", translate_to="fr")
+
+
+def test_translate_text_same_lang_is_noop():
+    from voxscribe.translate import translate_text
+    assert translate_text("hello", "en", "en") == "hello"
+
+
+def test_cli_rejects_translate_to_without_source(capsys):
+    from voxscribe.cli import main
+    assert main(["x.opus", "--to", "fr"]) == 2
+    assert "explicit --language" in capsys.readouterr().err

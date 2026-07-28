@@ -21,6 +21,7 @@ def transcribe_file(
     model: str = "base",
     fmt: str = "txt",
     translate: bool = False,
+    translate_to: str | None = None,
 ) -> str:
     """Core logic, independent of MCP — kept importable for tests."""
     audio = Path(path).expanduser()
@@ -28,8 +29,16 @@ def transcribe_file(
         raise ValueError(f"no such file: {audio}")
     if fmt not in _FORMATS:
         raise ValueError(f"unknown format {fmt!r}; choose from {', '.join(_FORMATS)}")
+    if translate_to:
+        if fmt != "txt":
+            raise ValueError("translate_to only works with txt format")
+        if language == "auto":
+            raise ValueError("translate_to requires an explicit source language, not 'auto'")
     resolved = resolve_model(model)
     result = _transcribe(audio, resolved, language=language, fmt=fmt, translate=translate, quiet=True)
+    if translate_to:
+        from .translate import translate_text
+        return translate_text(result.text, language, translate_to)
     return result.text
 
 
@@ -52,6 +61,7 @@ def build_server():
         model: str = "base",
         format: str = "txt",
         translate: bool = False,
+        translate_to: str | None = None,
     ) -> str:
         """Transcribe a local audio file (WhatsApp .opus, .mp3, .m4a, .ogg, .wav, …).
 
@@ -63,13 +73,16 @@ def build_server():
             model: Whisper model — one of tiny, base, small, medium, large-v3,
                 large-v3-turbo (downloaded on first use). Bigger = more accurate, slower.
             format: Output format — 'txt' (default), 'srt', 'vtt', or 'json'.
-            translate: If true, translate the speech into English.
+            translate: If true, translate the speech into English (fast, via whisper).
+            translate_to: Translate the transcript into this language code, e.g. 'fr'
+                (offline; requires an explicit source language and txt format).
 
         Returns:
             The transcription in the requested format.
         """
         try:
-            return transcribe_file(path, language=language, model=model, fmt=format, translate=translate)
+            return transcribe_file(path, language=language, model=model, fmt=format,
+                                   translate=translate, translate_to=translate_to)
         except DependencyError as exc:
             raise RuntimeError(str(exc)) from exc
 

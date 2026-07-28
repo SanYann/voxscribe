@@ -38,7 +38,10 @@ def _build_parser() -> argparse.ArgumentParser:
     p.add_argument("-o", "--output", type=Path,
                    help="write to this file instead of stdout (single input only)")
     p.add_argument("--translate", action="store_true",
-                   help="translate the speech to English")
+                   help="translate the speech to English (fast, built into whisper)")
+    p.add_argument("--to", dest="translate_to", metavar="LANG",
+                   help="translate the transcript into this language, e.g. fr, es (offline; "
+                        "requires an explicit --language source and txt format)")
     p.add_argument("-t", "--threads", type=int, default=None, help="number of threads")
     p.add_argument("-q", "--quiet", action="store_true", help="suppress whisper.cpp logs")
     p.add_argument("-V", "--version", action="version", version=f"voxscribe {__version__}")
@@ -51,6 +54,14 @@ def main(argv: list[str] | None = None) -> int:
     if args.output and len(args.audio) > 1:
         print("voxscribe: --output cannot be used with multiple input files", file=sys.stderr)
         return 2
+
+    if args.translate_to:
+        if args.format != "txt":
+            print("voxscribe: --to only works with txt format", file=sys.stderr)
+            return 2
+        if args.language == "auto":
+            print("voxscribe: --to requires an explicit --language source, e.g. -l en --to fr", file=sys.stderr)
+            return 2
 
     try:
         model = resolve_model(args.model)
@@ -81,6 +92,14 @@ def main(argv: list[str] | None = None) -> int:
             print(f"voxscribe: failed on {audio}: {exc}", file=sys.stderr)
             rc = 1
             continue
+
+        if args.translate_to:
+            from .translate import translate_text
+            try:
+                result.text = translate_text(result.text, args.language, args.translate_to).strip() + "\n"
+            except RuntimeError as exc:
+                print(f"voxscribe: {exc}", file=sys.stderr)
+                return 3
 
         if args.output:
             args.output.write_text(result.text, encoding="utf-8")

@@ -1,6 +1,6 @@
 # voxscribe
 
-Transcribe voice notes — WhatsApp `.opus`, `.mp3`, `.m4a`, `.ogg`, anything `ffmpeg` reads — **locally**, on your machine, with [whisper.cpp](https://github.com/ggerganov/whisper.cpp). No cloud, no API keys, no audio leaving your laptop.
+Transcribe — and optionally translate — voice notes (WhatsApp `.opus`, `.mp3`, `.m4a`, `.ogg`, anything `ffmpeg` reads) **locally**, on your machine, with [whisper.cpp](https://github.com/ggerganov/whisper.cpp). No cloud, no API keys, no audio leaving your laptop.
 
 It started as a one-off: a friend sent a 1-minute WhatsApp voice note and asked "can you transcribe this?". This is that, packaged.
 
@@ -76,6 +76,7 @@ voxscribe note.opus -l fr                # force French
 voxscribe note.opus -m medium            # use a bigger, more accurate model
 voxscribe note.opus -f srt -o note.srt   # write subtitles
 voxscribe note.m4a -l es --translate     # transcribe + translate to English
+voxscribe note.opus -l en --to fr        # transcribe English, translate to French (offline)
 voxscribe *.opus -l fr                   # batch: writes note.txt next to each file
 ```
 
@@ -85,9 +86,28 @@ voxscribe *.opus -l fr                   # batch: writes note.txt next to each f
 | `-m, --model` | Model name or path to a `.bin` (default `base`) |
 | `-f, --format` | `txt` (default), `srt`, `vtt`, `json` |
 | `-o, --output` | Write to a file instead of stdout (single input) |
-| `--translate` | Translate the speech to English |
+| `--translate` | Translate the speech to English (fast, built into whisper) |
+| `--to LANG` | Translate the transcript into any language, e.g. `fr` (offline — see below) |
 | `-t, --threads` | Number of threads |
 | `-q, --quiet` | Suppress whisper.cpp logging |
+
+### Translate to any language (offline)
+
+`--translate` uses whisper's built-in English translation. To translate into
+**any** language — still fully offline, no API keys — install the `translate`
+extra (adds [Argos Translate](https://github.com/argosopentech/argos-translate)):
+
+```bash
+pipx install "voxscribe[translate]"   # or: pip install "voxscribe[translate]"
+```
+
+```bash
+voxscribe note.opus -l en --to fr     # English audio -> French text
+voxscribe note.opus -l fr --to es     # French audio  -> Spanish text
+```
+
+The language pack downloads automatically on first use. `--to` needs an
+explicit `-l` source language and `txt` format.
 
 ### Models
 
@@ -124,7 +144,7 @@ It exposes two tools:
 
 | Tool | Description |
 | --- | --- |
-| `transcribe` | Transcribe a local audio file (`path`, `language`, `model`, `format`, `translate`) |
+| `transcribe` | Transcribe a local audio file (`path`, `language`, `model`, `format`, `translate`, `translate_to`) |
 | `list_models` | List available models and their size / quality trade-offs |
 
 ### Claude Code

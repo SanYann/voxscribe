@@ -23,6 +23,7 @@ dependencies = []
 
 [project.optional-dependencies]
 mcp = ["mcp>=1.2.0"]
+translate = ["argostranslate>=1.9"]
 
 [project.urls]
 Homepage = "https://github.com/SanYann/voxscribe"
